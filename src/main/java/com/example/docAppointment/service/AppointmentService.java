@@ -38,14 +38,17 @@ public class AppointmentService {
         }
         appointmentRepo.markSlotUnavailable(availId);
         //confirmation
-        TransactionSynchronizationManager.registerSynchronization(
-                new TransactionSynchronization() {
-                    @Override
-                    public void afterCommit() {
-                        bookingMetric.recordSuccess();
+
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(
+                    new TransactionSynchronization() {
+                        @Override
+                        public void afterCommit() {
+                            bookingMetric.recordSuccess();
+                        }
                     }
-                }
-        );
+            );
+        }
         notificationService.sendAfterCommit(
                 "booking-" + result,
                 "patient-" + userId,

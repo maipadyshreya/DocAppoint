@@ -19,11 +19,12 @@ class AppointmentServiceTest {
 
     @Mock
     private AppointmentRepo appointmentRepo;
-
+    @Mock
+    private NotificationService notificationService;
     @InjectMocks
     private AppointmentService appointmentService;
 
-    // TEST 1: Successfully book an available appointment
+ // Successfully book an available appointment
     @Test
     void bookAvailableAppointmentSuccessfully() {
 
@@ -52,7 +53,7 @@ class AppointmentServiceTest {
         verify(appointmentRepo).markSlotUnavailable(availId);
     }
 
-    // TEST 2: Reject booking when slot is unavailable
+  //Reject booking when slot is unavailable
     @Test
     void rejectBookingUnavailableSlot() {
 
@@ -76,7 +77,7 @@ class AppointmentServiceTest {
                 .markSlotUnavailable(anyInt());
     }
 
-    // TEST 3: Reject booking when doctor does not offer service
+// Reject booking when doctor does not offer service
     @Test
     void rejectBookingInvalidService() {
 
@@ -100,7 +101,7 @@ class AppointmentServiceTest {
                 .bookAppointment(anyInt(), anyInt(), anyInt());
     }
 
-    // TEST 4: Reject cancellation by someone other than owner
+  // Reject cancellation by someone other than owner
     @Test
     void rejectCancellationByNonOwner() {
 
@@ -130,7 +131,7 @@ class AppointmentServiceTest {
                 .reopenFutureSlot(anyInt());
     }
 
-    // TEST 5: Successfully cancel own appointment
+   // Successfully cancel own appointment
     @Test
     void cancelOwnAppointmentSuccessfully() {
 
