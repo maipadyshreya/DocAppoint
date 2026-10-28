@@ -1,0 +1,34 @@
+
+services:
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: doctor_appointment
+      MYSQL_USER: docapp
+      MYSQL_PASSWORD: docapppassword
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./src/main/resources/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/doctor_appointment
+      SPRING_DATASOURCE_USERNAME: docapp
+      SPRING_DATASOURCE_PASSWORD: docapppassword
+      NOTIFICATION_URL: http://localhost:8080/mock-notifications
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  mysql_data:

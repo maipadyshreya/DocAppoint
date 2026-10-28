@@ -34,4 +34,34 @@ public class AuthService {
         return user;
     }
 
+    public void register(String name, String email, String password) {
+
+        if (name == null || name.isBlank() ||
+                email == null || email.isBlank() ||
+                password == null || password.length() < 8) {
+            throw new IllegalArgumentException("Invalid registration details");
+        }
+
+        email = email.trim().toLowerCase();
+
+        User existingUser = userRepo.findByEmail(email);
+
+        if (existingUser != null) {
+            throw new IllegalArgumentException("Email already registered");
+        }
+
+        String hashedPassword = passwordEncoder.encode(password);
+
+        User newUser = new User(
+                0,
+                name.trim(),
+                email,
+                hashedPassword,
+                "Patient"
+        );
+
+        userRepo.save(newUser);
+    }
+
+
 }

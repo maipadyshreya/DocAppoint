@@ -1,6 +1,7 @@
 package com.example.docAppointment.controller;
 
 import com.example.docAppointment.dto.LoginUser;
+import com.example.docAppointment.dto.RegisterUser;
 import com.example.docAppointment.dto.User;
 import com.example.docAppointment.service.AuthService;
 import jakarta.servlet.http.HttpSession;
@@ -64,4 +65,28 @@ public class AuthController {
 
         return ResponseEntity.ok(user);
     }
+
+    @PostMapping("/register")
+    public ResponseEntity<String> register(
+            @RequestBody RegisterUser request) {
+
+        try {
+            authService.register(
+                    request.getName(),
+                    request.getEmail(),
+                    request.getPassword()
+            );
+
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body("Account created successfully!");
+
+        } catch (IllegalArgumentException e) {
+
+            return ResponseEntity
+                    .badRequest()
+                    .body(e.getMessage());
+        }
+    }
+
 }

@@ -1,0 +1,200 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign Up | DocAppoint</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f4f7fc;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        width: 900px;
+        max-width: 95%;
+        min-height: 580px;
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 15px 50px #153b7020;
+    }
+
+    .left {
+        background: linear-gradient(135deg, #1763c6, #28a9c9);
+        color: white;
+        padding: 55px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .left h1 { font-size: 34px; }
+    .left p { line-height: 1.8; color: #e6f4ff; }
+
+    .right {
+        padding: 45px 55px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .right h2 { margin-bottom: 8px; }
+    .subtitle { color: #718096; margin-bottom: 25px; }
+
+    label {
+        display: block;
+        font-size: 13px;
+        font-weight: bold;
+        margin: 15px 0 7px;
+    }
+
+    input {
+        width: 100%;
+        padding: 13px;
+        border: 1px solid #dce3ed;
+        border-radius: 9px;
+        font-size: 14px;
+    }
+
+    input:focus {
+        outline: none;
+        border-color: #1763c6;
+    }
+
+    button {
+        width: 100%;
+        margin-top: 25px;
+        padding: 14px;
+        border: none;
+        border-radius: 9px;
+        background: #1763c6;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    button:hover { background: #104c9e; }
+    button:disabled { opacity: .6; cursor: wait; }
+
+    .footer { text-align: center; margin-top: 22px; }
+    a { color: #1763c6; text-decoration: none; }
+
+    #message { margin-top: 14px; font-size: 14px; }
+
+    @media (max-width: 700px) {
+        .container { grid-template-columns: 1fr; }
+        .left { padding: 25px; }
+        .right { padding: 30px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="left">
+    <h1>DocAppoint</h1>
+    <h2>Your health, our priority.</h2>
+    <p>
+      Find trusted doctors, book appointments,
+      and manage your healthcare in one place.
+    </p>
+  </div>
+
+  <div class="right">
+    <h2>Create an account</h2>
+    <p class="subtitle">Start your healthcare journey today.</p>
+
+    <form id="registerForm">
+      <label for="name">Full Name</label>
+      <input id="name" type="text" required
+             placeholder="Enter your full name">
+
+      <label for="email">Email Address</label>
+      <input id="email" type="email" required
+             placeholder="Enter your email">
+
+      <label for="password">Password</label>
+      <input id="password" type="password" required
+             minlength="8" placeholder="At least 8 characters">
+
+      <label for="confirmPassword">Confirm Password</label>
+      <input id="confirmPassword" type="password" required
+             placeholder="Confirm your password">
+
+      <button id="submitBtn" type="submit">
+        Create Account
+      </button>
+    </form>
+
+    <div id="message" role="status" aria-live="polite"></div>
+
+    <div class="footer">
+      Already have an account?
+      <a href="/login">Sign In</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById("registerForm")
+      .addEventListener("submit", async function(event) {
+          event.preventDefault();
+
+          const name = document.getElementById("name").value.trim();
+          const email = document.getElementById("email").value.trim();
+          const password = document.getElementById("password").value;
+          const confirm = document.getElementById("confirmPassword").value;
+          const message = document.getElementById("message");
+          const button = document.getElementById("submitBtn");
+
+          if (password !== confirm) {
+              message.style.color = "red";
+              message.textContent = "Passwords do not match.";
+              return;
+          }
+
+          button.disabled = true;
+          message.textContent = "";
+
+          try {
+              const response = await fetch("/auth/register", {
+                  method: "POST",
+                  headers: {
+                      "Content-Type": "application/json"
+                  },
+                  credentials: "same-origin",
+                  body: JSON.stringify({ name, email, password })
+              });
+
+              const result = await response.text();
+
+              if (response.ok) {
+                  message.style.color = "green";
+                  message.textContent = "Account created successfully!";
+                  window.location.href = "/login";
+              } else {
+                  message.style.color = "red";
+                  message.textContent = result;
+              }
+          } catch (error) {
+              message.style.color = "red";
+              message.textContent = "Unable to connect to server.";
+          } finally {
+              button.disabled = false;
+          }
+      });
+</script>
+
+</body>
+</html>

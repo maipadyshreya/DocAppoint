@@ -1,0 +1,46 @@
+name: DocAppoint CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: doctor_appointment
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -uroot -prootpassword"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Initialize database
+        run: |
+          mysql -h 127.0.0.1 -uroot -prootpassword doctor_appointment < src/main/resources/schema.sql
+          mysql -h 127.0.0.1 -uroot -prootpassword doctor_appointment < src/main/resources/seed.sql
+
+      - name: Build and test
+        run: mvn -B verify
+        env:
+          SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/doctor_appointment
+          SPRING_DATASOURCE_USERNAME: root
+          SPRING_DATASOURCE_PASSWORD: rootpassword

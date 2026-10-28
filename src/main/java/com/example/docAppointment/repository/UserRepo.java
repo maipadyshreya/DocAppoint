@@ -44,4 +44,23 @@ public class UserRepo {
 
         return users.get(0);
     }
+
+
+    public void save(User user) {
+
+        String sql = """
+            INSERT INTO users
+                (name, email, password, role)
+            VALUES (?, ?, ?, ?)
+            """;
+
+        jdbcTemplate.update(
+                sql,
+                user.getName(),
+                user.getEmail(),
+                user.getPassword(),
+                user.getRole()
+        );
+    }
+
 }

@@ -6,12 +6,15 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.server.ResponseStatusException;
-
 @Service
 @RequiredArgsConstructor
 public class AppointmentService {
  private final AppointmentRepo appointmentRepo;
+ private final NotificationService notificationService;
+    private final BookingMetric bookingMetric;
 
     @Transactional
     public int bookAppointment(int userId, int availId, int serviceId) {
@@ -34,6 +37,21 @@ public class AppointmentService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "This appointment slot is already booked");
         }
         appointmentRepo.markSlotUnavailable(availId);
+        //confirmation
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        bookingMetric.recordSuccess();
+                    }
+                }
+        );
+        notificationService.sendAfterCommit(
+                "booking-" + result,
+                "patient-" + userId,
+                "BOOKING_CONFIRMATION",
+                "Your appointment has been booked successfully."
+        );
 
         return result;
     }
@@ -68,5 +86,14 @@ public class AppointmentService {
         }
 
         appointmentRepo.reopenFutureSlot(availId);
+
+        //confiramtion
+        notificationService.sendAfterCommit(
+                "cancel-" + appointmentId,
+                "patient-" + userId,
+                "CANCELLATION_CONFIRMATION",
+                "Your appointment has been cancelled."
+        );
+
     }
 }

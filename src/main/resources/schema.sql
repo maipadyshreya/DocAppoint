@@ -1,9 +1,9 @@
--- MySQL dump 10.13  Distrib 8.0.30, for macos12 (x86_64)
+-- MySQL dump 10.13  Distrib 9.3.0, for macos15 (x86_64)
 --
 -- Host: 127.0.0.1    Database: doctor_appointment
 -- ------------------------------------------------------
 -- Server version	9.3.0
-SET FOREIGN_KEY_CHECKS = 0;
+
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
@@ -29,14 +29,16 @@ CREATE TABLE `appointments` (
   `service_id` int NOT NULL,
   `status` varchar(30) NOT NULL DEFAULT 'SCHEDULED',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `active_slot_id` int GENERATED ALWAYS AS ((case when (`status` in (_utf8mb4'SCHEDULED',_utf8mb4'BOOKED')) then `avail_id` else NULL end)) STORED,
   PRIMARY KEY (`appointment_id`),
-  UNIQUE KEY `uq_appointment_slot` (`avail_id`),
+  UNIQUE KEY `uq_active_appointment_slot` (`active_slot_id`),
   KEY `fk_appointment_user` (`user_id`),
   KEY `fk_appointment_service` (`service_id`),
+  KEY `idx_appointments_avail_id` (`avail_id`),
   CONSTRAINT `fk_appointment_service` FOREIGN KEY (`service_id`) REFERENCES `services` (`service_id`),
   CONSTRAINT `fk_appointment_slot` FOREIGN KEY (`avail_id`) REFERENCES `availability_slots` (`avail_id`),
   CONSTRAINT `fk_appointment_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -53,11 +55,14 @@ CREATE TABLE `availability_slots` (
   `end_time` time NOT NULL,
   `is_avail` tinyint(1) NOT NULL DEFAULT '1',
   `appointment_date` date NOT NULL,
+  `service_id` int DEFAULT NULL,
   PRIMARY KEY (`avail_id`),
   KEY `fk_slot_doctor` (`dr_id`),
+  KEY `fk_availability_service` (`service_id`),
+  CONSTRAINT `fk_availability_service` FOREIGN KEY (`service_id`) REFERENCES `services` (`service_id`),
   CONSTRAINT `fk_slot_doctor` FOREIGN KEY (`dr_id`) REFERENCES `doctors` (`dr_id`),
   CONSTRAINT `chk_slot_time` CHECK ((`end_time` > `start_time`))
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -136,5 +141,5 @@ CREATE TABLE `users` (
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-SET FOREIGN_KEY_CHECKS = 1;
--- Dump completed on 2026-09-24 20:03:58
+
+-- Dump completed on 2026-10-26 18:47:31

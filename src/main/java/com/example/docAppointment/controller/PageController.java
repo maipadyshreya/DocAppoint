@@ -29,4 +29,9 @@ public class PageController {
 
         return "appointments";
     }
+    @GetMapping("/register")
+    public String registerPage() {
+        return "register";
+    }
+
 }

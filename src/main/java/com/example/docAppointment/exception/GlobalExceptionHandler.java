@@ -69,6 +69,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleUnexpected(
             Exception ex) {
+        ex.printStackTrace();
 
         return error(HttpStatus.INTERNAL_SERVER_ERROR,
                 "An unexpected server error occurred");
