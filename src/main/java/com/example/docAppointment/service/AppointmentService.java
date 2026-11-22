@@ -48,16 +48,18 @@ public class AppointmentService {
                         }
                     }
             );
-        }
-        notificationService.sendAfterCommit(
-                "booking-" + result,
-                "patient-" + userId,
-                "BOOKING_CONFIRMATION",
-                "Your appointment has been booked successfully."
-        );
+            notificationService.sendAfterCommit(
+                    "booking-" + result,
+                    "patient-" + userId,
+                    "BOOKING_CONFIRMATION",
+                    "Your appointment has been booked successfully."
+            );
+             }
 
-        return result;
-    }
+            return result;
+        }
+
+
 
     @Transactional
     public void cancelAppointment(int appointmentId, int userId) {

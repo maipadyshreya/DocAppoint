@@ -1,0 +1,26 @@
+
+CLINIC FAQ KNOWLEDGE BASE
+
+Q: How do I book an appointment?
+A: Log in, check available appointment slots, select a service and time, and confirm the booking.
+
+Q: How do I cancel an appointment?
+A: Log in, view your appointments, select the appointment you want to cancel, and confirm cancellation.
+
+Q: Can I view my appointments?
+A: Yes. Logged-in patients can view their appointment history.
+
+Q: Can I book an appointment without logging in?
+A: No. Patients must be logged in to book appointments.
+
+Q: Can I book an appointment for another patient?
+A: No. Appointments are associated with the logged-in patient's account.
+
+Q: How do appointment reminders work?
+A: The system checks for scheduled appointments within the next 24 hours and generates personalized reminders.
+
+Q: Can I cancel another patient's appointment?
+A: No. Patients can cancel only appointments associated with their own account.
+
+Q: What happens after I cancel an appointment?
+A: The appointment is marked as cancelled. If the appointment slot is in the future, it becomes available for booking again.

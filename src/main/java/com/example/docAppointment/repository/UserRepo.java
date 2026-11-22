@@ -63,4 +63,28 @@ public class UserRepo {
         );
     }
 
+    public java.util.List<java.util.Map<String, Object>> findUpcomingAppointments() {
+        String sql = """
+        SELECT a.appointment_id,
+               a.user_id,
+               u.name AS patient_name,
+               u.email AS patient_email,
+               s.appointment_date,
+               s.start_time,
+               s.dr_id,
+               s.service_id
+        FROM appointments a
+        JOIN availability_slots s
+          ON a.avail_id = s.avail_id
+        JOIN users u
+          ON a.user_id = u.user_id
+        WHERE a.status = 'SCHEDULED'
+          AND TIMESTAMP(s.appointment_date, s.start_time)
+              BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 24 HOUR)
+        ORDER BY s.appointment_date, s.start_time
+        """;
+
+        return jdbcTemplate.queryForList(sql);
+    }
+
 }

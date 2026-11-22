@@ -17,7 +17,8 @@ public class NotificationListener {
 
     @Async("notificationExecutor")
     @TransactionalEventListener(
-            phase = TransactionPhase.AFTER_COMMIT
+            phase = TransactionPhase.AFTER_COMMIT,
+            fallbackExecution = true
     )
     public void handle(NotificationReq request) {
         gateway.send(request);
